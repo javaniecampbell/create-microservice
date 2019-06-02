@@ -18,6 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "command-exists": "^1.2.8",
+    "rxjs": "^6.5.2",
     "tsc-watch": "^2.2.1"
   },
   "repository": {
