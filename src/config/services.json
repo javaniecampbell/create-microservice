@@ -1,0 +1,78 @@
+{
+    "discovery-server": {
+        "uri": "",
+        "port": ""
+    },
+    "configuration-server": {
+        "uri": "",
+        "port": "",
+        "configurations": {
+            "service": "face-ai-service",
+            "configuration": [
+                {}
+            ]
+        }
+    },
+    "microservices": [
+        {
+            "name": null,
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "face-ai-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "trn-validation-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "drivers-license-validation-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "address-autosuggest-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "trn-validation-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "kyc-verification-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "customer-feedback-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "customer-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "authentication-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name": "configuration-service",
+            "version": "1.0.0",
+            "platform": "node"
+        },
+        {
+            "name": "service-registry",
+            "version": "1.0.0",
+            "platform": "node"
+        }
+    ]
+}
