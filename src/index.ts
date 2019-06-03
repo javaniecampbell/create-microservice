@@ -4,7 +4,10 @@ import path from "path";
 import slug from "./lib/slug";
 import settings from "./config/services.json";
 import commandExists from "command-exists";
-import { exec } from "child_process"
+import { execSync, exec } from "child_process"
+import { Observable, from, fromEventPattern } from "rxjs";
+import { map } from "rxjs/operators";
+
 
 const readAsync = promisify(fs.readFile);
 const writeAsync = promisify(fs.writeFile);
@@ -34,7 +37,7 @@ const changeDirectory = (directoryPath: string) => {
 
     console.log(`Switching from ${process.cwd()}  to ${directoryPath}`);
     process.chdir(directoryPath);
-
+    from
 };
 
 const addService = async (name: String, version: String) => {
@@ -63,7 +66,7 @@ const main = async () => {
             fs.mkdirSync(DIST_FOLDER_PATH);
         }
 
-        config.microservices.forEach((microservice: any) => {
+        iterateMicroservices(config, (microservice: any) => {
             try {
                 if (!microservice) return;
                 if (microservice && !microservice.name) return;
@@ -71,59 +74,25 @@ const main = async () => {
                 let MICROSERVICE_DIR_PATH = path.join(__dirname, `folders/${microservice.name}/`).toLowerCase();
                 if (!fs.existsSync(MICROSERVICE_DIR_PATH)) {
                     fs.mkdirSync(MICROSERVICE_DIR_PATH);
-                    // setTimeout(() => {
-                        initializePlatforms(microservice, MICROSERVICE_DIR_PATH);
-                    // }, 2000);
+
+                    initializePlatforms(microservice, MICROSERVICE_DIR_PATH);
+
                 } else {
                     if (isDirectoryEmpty(MICROSERVICE_DIR_PATH)) {
-                        // setTimeout(() => {
-                            initializePlatforms(microservice, MICROSERVICE_DIR_PATH);
-                        // }, 2000);
+                        initializePlatforms(microservice, MICROSERVICE_DIR_PATH);
                     } else {
-                        console.log(`Skipping creation ${microservice.platform} project for ${microservice.name} microservice at location: ${process.cwd()}.`);
+                        console.log(`Skipping creation ${microservice.platform} folder for ${microservice.name} microservice at location: ${process.cwd()}.`);
                     }
                 }
-
             } catch (error) {
-                console.log(error);
-                // return;
+               // console.log(error);
+                throw error;
             }
         });
-
-
-        config.microservices.forEach((microservice: any) => {
-            try {
-                if (!microservice) return;
-                if (microservice && !microservice.name) return;
-
-                let MICROSERVICE_DIR_PATH = path.join(__dirname, `folders/${microservice.name}/`).toLowerCase();
-                if (fs.existsSync(MICROSERVICE_DIR_PATH)) {
-                    // setTimeout(() => {
-                        commandExists('git', (_error, exists) => {
-                            if (exists) {
-                                changeDirectory(MICROSERVICE_DIR_PATH);
-                                //https://stackoverflow.com/questions/34953168/node-check-existence-of-command-in-path
-                                exec("git init", handleOutput);
-                                console.log(`Initialize repository for ${microservice.name}`);
-
-                            }
-                        });
-                    // }, 2500);
-                }
-
-            } catch (error) {
-                console.log(error);
-                // return;
-            }
-        });
-
-
-
 
     } catch (error) {
-        console.log(error);
+        throw error;
     }
-
 }
 
 const readConfigurationAysnc = async (FILEPATH: string) => {
@@ -138,6 +107,7 @@ const initializePlatforms = (microservice: any, projectPath: string) => {
             if (exists) {
                 changeDirectory(projectPath);
                 exec(`dotnet new webapi`, handleOutput);
+                //execSync(`dotnet new webapi`);
                 console.log(`Created ${microservice.platform} project for ${microservice.name} microservice at location: ${process.cwd()}.`);
 
                 //   changeDirectory("..");
@@ -151,7 +121,8 @@ const initializePlatforms = (microservice: any, projectPath: string) => {
             if (exists) {
                 changeDirectory(projectPath);
                 // const { stdout, stderr } = await executeCmd("npx create-express-api ");
-                exec(`npx express --no-view`, handleOutput);
+                // exec(`npx express --no-view`, handleOutput);
+                execSync(`npx express --no-view -f`);
                 console.log(`Created ${microservice.platform} project for ${microservice.name} microservice at location: ${process.cwd()}.`);
 
                 // changeDirectory("..");
@@ -161,10 +132,11 @@ const initializePlatforms = (microservice: any, projectPath: string) => {
 
     }
     if (microservice.platform && microservice.platform === "node") {
-        commandExists('express', (_error, exists) => {
+        commandExists('npx', (_error, exists) => {
             if (exists) {
                 changeDirectory(projectPath);
-                exec(`npx express --view=hbs`, handleOutput);
+                // exec(`npx express --view=hbs`, handleOutput);
+                execSync(`npx express --view=hbs -f`);
                 console.log(`Created ${microservice.platform} project for ${microservice.name} microservice at location: ${process.cwd()}.`);
 
                 //changeDirectory("..");
@@ -172,11 +144,47 @@ const initializePlatforms = (microservice: any, projectPath: string) => {
 
         });
     }
+    initializeGitRepository(microservice, projectPath);
 }
 
-main();
+from(main()).subscribe((_) => {
+    console.log("Doing some work now!!")
+}, (error) => {
+    console.log("Main Error: ", error);
+}, () => {
+    console.log("Main Completed !")
+});
+const initializeGitRepository = (microservice: any, path: string) => {
+    try {
+        if (fs.existsSync(path)) {
+            // setTimeout(() => {
+            commandExists('git', (_error, exists) => {
+                if (exists) {
+                    changeDirectory(path);
+                    //https://stackoverflow.com/questions/34953168/node-check-existence-of-command-in-path
+                    exec("git init", handleOutput);
+                    //execSync("git init");
+                    console.log(`Initialize repository for ${microservice.name}`);
+                }
+                if (_error) {
+                    throw _error;
+                }
+            });
+            // }, 2500);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+const iterateMicroservices = (config: any, callback: Function) => {
+    config.microservices.forEach((microservice: any) => {
+        callback(microservice);
+    });
+};
 
-function isDirectoryEmpty(MICROSERVICE_DIR_PATH: string) {
+const isDirectoryEmpty = (MICROSERVICE_DIR_PATH: string) => {
     // https://stackoverflow.com/questions/39217271/how-to-determine-whether-the-directory-is-empty-directory-with-nodejs
     let isEmpty: boolean = false;
     fs.readdir(MICROSERVICE_DIR_PATH, (err, files) => {
@@ -193,13 +201,16 @@ function isDirectoryEmpty(MICROSERVICE_DIR_PATH: string) {
     });
 
     return isEmpty;
-}
+};
 
-function handleOutput(error: any, stderr: any, stdout: any) {
-    if(error)
-    console.log(error);
+const handleOutput = (error: any, stderr: any, stdout: any) => {
+    if (error) {
+        console.log(error);
+        throw error;
+    }
     if (stdout)
         console.log(`stdout: \n ${stdout}`);
-    if (stderr)
+    if (stderr) {
         console.log(`stderr: \n ${stderr}`);
-}
+    }
+};

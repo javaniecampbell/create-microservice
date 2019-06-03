@@ -4,7 +4,8 @@
   "description": "A package used to create node-based microservice folder structure",
   "main": "src/index.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node ./dist/index.js\""
+    "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
+    "build": "tsc"
   },
   "keywords": [
     "microservice",
