@@ -2,7 +2,7 @@
   "name": "create-microservice",
   "version": "1.0.0",
   "description": "A package used to create node-based microservice folder structure",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
     "build": "tsc"

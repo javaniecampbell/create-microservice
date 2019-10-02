@@ -2,19 +2,21 @@ import fs, { fdatasync } from "fs";
 import { promisify } from "util";
 import path from "path";
 import slug from "./lib/slug";
+import settings from "./config/services.json";
 import commandExists from "command-exists";
 import { execSync, exec } from "child_process"
-import { from } from "rxjs";
+import { from, fromEventPattern, bindNodeCallback } from "rxjs";
+import { map } from "rxjs/operators";
 
 
 const readAsync = promisify(fs.readFile);
 const writeAsync = promisify(fs.writeFile);
 const existsAsync = promisify(fs.exists);
-export const executeCmd = promisify(exec); //https://stackoverflow.com/questions/20643470/execute-a-command-line-binary-with-node-js
-export const processChdir = promisify(process.chdir);
+const executeCmd = promisify(exec); //https://stackoverflow.com/questions/20643470/execute-a-command-line-binary-with-node-js
+const processChdir = promisify(process.chdir);
 const FILEPATH = path.join(__dirname, "config/services.json");
 
-export const saveConfigAsync = async (action: Function) => {
+const saveConfigAsync = async (action: Function) => {
     try {
         if (await existsAsync(FILEPATH)) {
             const config = await readConfigurationAysnc(FILEPATH);
@@ -35,10 +37,10 @@ const changeDirectory = (directoryPath: string) => {
 
     console.log(`Switching from ${process.cwd()}  to ${directoryPath}`);
     process.chdir(directoryPath);
-    
+    from
 };
 
-export const addService = async (name: String, version: String) => {
+const addService = async (name: String, version: String) => {
     try {
         const escapedName = slug(name.toString());
         await saveConfigAsync((config: any) => {
@@ -183,7 +185,7 @@ const iterateMicroservices = (config: any, callback: Function) => {
     });
 };
 
-export const isDirectoryEmpty = (MICROSERVICE_DIR_PATH: string) => {
+const isDirectoryEmpty = (MICROSERVICE_DIR_PATH: string) => {
     // https://stackoverflow.com/questions/39217271/how-to-determine-whether-the-directory-is-empty-directory-with-nodejs
     let isEmpty: boolean = false;
     fs.readdir(MICROSERVICE_DIR_PATH, (err, files) => {

@@ -73,6 +73,16 @@
             "name": "service-registry",
             "version": "1.0.0",
             "platform": "node"
+        },
+        {
+            "name": "csv-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
+        },
+        {
+            "name":"shopping-cart-service",
+            "version": "1.0.0",
+            "platform": ".netcore"
         }
     ]
 }
