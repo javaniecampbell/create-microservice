@@ -1,7 +1,7 @@
-import fs, { fdatasync } from "fs";
+import fs from "fs";
 import { promisify } from "util";
 import path from "path";
-import slug from "./lib/slug";
+import slug from "../lib/slug";
 import commandExists from "command-exists";
 import { execSync, exec } from "child_process"
 import { from } from "rxjs";
@@ -213,3 +213,4 @@ const handleOutput = (error: any, stderr: any, stdout: any) => {
         console.log(`stderr: \n ${stderr}`);
     }
 };
+

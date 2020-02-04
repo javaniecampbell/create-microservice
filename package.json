@@ -1,8 +1,12 @@
 {
-  "name": "create-microservice",
+  "name": "@devdaysatwork/create-microservice",
   "version": "1.0.0",
-  "description": "A package used to create node-based microservice folder structure",
+  "description": "A package used to create node-based microservice project structure",
   "main": "dist/index.js",
+  "bin": {
+    "@devdaysatwork/create-microservice": "dist/bin/create-microservice",
+    "create-microservice": "dist/bin/"
+  },
   "scripts": {
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
     "build": "tsc"
@@ -18,7 +22,10 @@
   "author": "Javanie Campbell",
   "license": "MIT",
   "dependencies": {
+    "arg": "^4.1.1",
     "command-exists": "^1.2.8",
+    "esm": "^3.2.25",
+    "inquirer": "^7.0.0",
     "rxjs": "^6.5.2",
     "tsc-watch": "^2.2.1"
   },

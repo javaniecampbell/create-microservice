@@ -1,8 +1,8 @@
 import fs, { fdatasync } from "fs";
 import { promisify } from "util";
 import path from "path";
-import slug from "./lib/slug";
-import settings from "./config/services.json";
+import slug from "../lib/slug";
+import settings from "../config/services.json";
 import commandExists from "command-exists";
 import { execSync, exec } from "child_process"
 import { from, fromEventPattern, bindNodeCallback } from "rxjs";
